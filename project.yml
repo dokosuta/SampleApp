@@ -1,0 +1,161 @@
+name: SampleApp
+configs:
+  Debug: debug
+  Release: release
+options:
+  developmentLanguage: ja
+  findCarthageFrameworks: true
+  deploymentTarget:
+    iOS: 13.6
+  postGenCommand: 
+    - pod install
+settings:
+  base:
+    SWIFT_VERSION: 5.0
+    IPHONEOS_DEPLOYMENT_TARGET: 13.0
+    PRODUCT_NAME: $TARGET_NAME
+    MARKETING_VERSION: 1.0.0
+    CURRENT_PROJECT_VERSION: 1
+  configs:
+    Debug:
+      MTL_ENABLE_DEBUG_INFO: INCLUDE_SOURCE
+      MTL_FAST_MATH: YES
+      SWIFT_ACTIVE_COMPILATION_CONDITIONS: DEBUG
+      SWIFT_OPTIMIZATION_LEVEL: -Onone
+    Release:
+      MTL_FAST_MATH: YES
+      SWIFT_COMPILATION_MODE: wholemodule
+      SWIFT_OPTIMIZATION_LEVEL: -O
+targets:
+  SampleApp:
+    type: application
+    platform: iOS
+    sources:
+      - SampleApp
+      - path: "SampleApp/R.generated.swift"
+        optional: true
+        type: file
+    settings:
+      base:
+        INFOPLIST_FILE: SampleApp/Info.plist
+        CODE_SIGN_STYLE: Automatic
+        DEVELOPMENT_LANGUAGE: jp
+      configs:
+        Debug:
+          DEVELOPMENT_ASSET_PATHS: '"SampleApp/Preview Content"'
+          PRODUCT_BUNDLE_IDENTIFIER: dokosuta.SampleApp
+        Release:
+          DEVELOPMENT_ASSET_PATHS: '"SampleApp/Preview Content"'
+          PRODUCT_BUNDLE_IDENTIFIER: dokosuta.SampleApp
+    prebuildScripts:
+      - name: 'R.swift'
+        inputFiles:
+          - $TEMP_DIR/rswift-lastrun
+        outputFiles:
+          - $SRCROOT/$PROJECT_NAME/R.generated.swift
+        runOnlyWhenInstalling: false
+        script: |
+          "$PODS_ROOT/R.swift/rswift" generate "$SRCROOT/$PROJECT_NAME/R.generated.swift"
+        shell: /bin/sh
+        showEnvVars: false
+      - name: 'Run Script Phase'
+        runOnlyWhenInstalling: false
+        script: |
+          # SwiftLint
+          "${PODS_ROOT}/SwiftLint/swiftlint"
+          # SwiftFormat
+          "${PODS_ROOT}/SwiftFormat/CommandLineTool/swiftformat" . --exclude ${PODS_ROOT},$SRCROOT/$PROJECT_NAME/R.generated.swift --swiftversion 5.3 --trimwhitespace nonblank-lines --stripunusedargs closure-only --disable strongOutlets,trailingCommas
+        shell: /bin/sh
+        showEnvVars: false
+      - name: '[CP] Check Pods Manifest.lock'
+        inputFiles:
+          - ${PODS_PODFILE_DIR_PATH}/Podfile.lock
+          - ${PODS_ROOT}/Manifest.lock
+        outputFiles:
+          - $(DERIVED_FILE_DIR)/Pods-SampleApp-checkManifestLockResult.txt
+        runOnlyWhenInstalling: false
+        script: |
+          "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\"
+          > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo
+          \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install'
+          or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output
+          is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\"
+          > \"${SCRIPT_OUTPUT_FILE_0}\"\n"
+        shell: /bin/sh
+        showEnvVars: false
+  SampleAppTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - SampleAppTests
+    settings:
+      base:
+        INFOPLIST_FILE: SampleAppTests/Info.plist
+        CODE_SIGN_STYLE: Automatic
+      configs:
+        Debug:
+          ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES: YES
+          BUNDLE_LOADER: $(TEST_HOST)
+          PRODUCT_BUNDLE_IDENTIFIER: dokosuta.SampleAppTests
+          TEST_HOST: $(BUILT_PRODUCTS_DIR)/SampleApp.app/SampleApp
+        Release:
+          ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES: YES
+          BUNDLE_LOADER: $(TEST_HOST)
+          PRODUCT_BUNDLE_IDENTIFIER: dokosuta.SampleAppTests
+          TEST_HOST: $(BUILT_PRODUCTS_DIR)/SampleApp.app/SampleApp
+    dependencies:
+      - target: SampleApp
+    prebuildScripts:
+      - name: '[CP] Check Pods Manifest.lock'
+        inputFiles:
+          - ${PODS_PODFILE_DIR_PATH}/Podfile.lock
+          - ${PODS_ROOT}/Manifest.lock
+        outputFiles:
+          - $(DERIVED_FILE_DIR)/Pods-SampleAppTests-checkManifestLockResult.txt
+        runOnlyWhenInstalling: false
+        script: |
+          "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\"
+          > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo
+          \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install'
+          or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output
+          is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\"
+          > \"${SCRIPT_OUTPUT_FILE_0}\"\n"
+        shell: /bin/sh
+        showEnvVars: false
+  SampleAppUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - SampleAppUITests
+    settings:
+      base:
+        INFOPLIST_FILE: SampleAppUITests/Info.plist
+        CODE_SIGN_STYLE: Automatic
+      configs:
+        Debug:
+          ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES: YES
+          PRODUCT_BUNDLE_IDENTIFIER: dokosuta.SampleAppUITests
+          TEST_TARGET_NAME: SampleApp
+        Release:
+          ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES: YES
+          PRODUCT_BUNDLE_IDENTIFIER: dokosuta.SampleAppUITests
+          TEST_TARGET_NAME: SampleApp
+    dependencies:
+      - target: SampleApp
+    prebuildScripts:
+      - name: '[CP] Check Pods Manifest.lock'
+        inputFiles:
+          - ${PODS_PODFILE_DIR_PATH}/Podfile.lock
+          - ${PODS_ROOT}/Manifest.lock
+        outputFiles:
+          - $(DERIVED_FILE_DIR)/Pods-SampleApp-SampleAppUITests-checkManifestLockResult.txt
+        runOnlyWhenInstalling: false
+        script: |
+          "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\"
+          > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo
+          \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install'
+          or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output
+          is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\"
+          > \"${SCRIPT_OUTPUT_FILE_0}\"\n"
+        shell: /bin/sh
+        showEnvVars: false
