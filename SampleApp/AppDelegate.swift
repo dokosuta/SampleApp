@@ -15,8 +15,8 @@ let log: SwiftyBeaver.Type? = {
         let console = ConsoleDestination()
         console.asynchronously = false
         let file = FileDestination()
-        logger.addDestination(console) // コンソールにログを出力する
-        logger.addDestination(file) // ファイルにログを出力する
+        logger.addDestination(console)
+        logger.addDestination(file)
     
         return logger
     #else
@@ -28,7 +28,9 @@ let log: SwiftyBeaver.Type? = {
 class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
-        true
+        log?.debug("Did finish launch.")
+        
+        return true
     }
 
     // MARK: UISceneSession Lifecycle
