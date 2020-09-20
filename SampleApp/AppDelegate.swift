@@ -6,7 +6,23 @@
 //  Copyright © 2020 窪田泰之. All rights reserved.
 //
 
+import SwiftyBeaver
 import UIKit
+
+let log: SwiftyBeaver.Type? = {
+    #if DEBUG
+        let logger = SwiftyBeaver.self
+        let console = ConsoleDestination()
+        console.asynchronously = false
+        let file = FileDestination()
+        logger.addDestination(console) // コンソールにログを出力する
+        logger.addDestination(file) // ファイルにログを出力する
+    
+        return logger
+    #else
+        return nil
+    #endif
+}()
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
